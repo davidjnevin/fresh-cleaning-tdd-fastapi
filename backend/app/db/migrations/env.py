@@ -57,7 +57,13 @@ def run_migrations_offline() -> None:
     """
     Run migrations in 'offline' mode.
     """
+    if os.environ.get("TESTING"):
+        raise DatabaseError(
+            "Running testing migrations offline currently not permitted."
+        )
+
     alembic.context.configure(url=str(DATABASE_URL))
+
     with alembic.context.begin_transaction():
         alembic.context.run_migrations()
 

@@ -45,7 +45,10 @@ def db(app: FastAPI) -> Database:
 async def test_cleaning(db: Database) -> CleaningInDB:
     cleaning_repo = CleaningsRepository(db)
     new_cleaning = CleaningCreate(
-        name="fake cleaning name", description="fake cleaning description", price=9.99, cleaning_type="spot_clean",
+        name="fake cleaning name",
+        description="fake cleaning description",
+        price=9.99,
+        cleaning_type="spot_clean",
     )
 
     return await cleaning_repo.create_cleaning(new_cleaning=new_cleaning)
@@ -56,7 +59,8 @@ async def test_cleaning(db: Database) -> CleaningInDB:
 async def client(app: FastAPI) -> AsyncClient:
     async with LifespanManager(app):
         async with AsyncClient(
-            app=app, base_url="http://testserver", headers={"Content-Type": "application/json"}
+            app=app,
+            base_url="http://testserver",
+            headers={"Content-Type": "application/json"},
         ) as client:
             yield client
-

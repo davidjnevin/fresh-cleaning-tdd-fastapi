@@ -39,6 +39,7 @@ DELETE_CLEANING_BY_ID_QUERY = """
     RETURNING id;
 """
 
+
 class CleaningsRepository(BaseRepository):
     """ "
     All database actions associated with the Cleaning resource
@@ -107,6 +108,8 @@ class CleaningsRepository(BaseRepository):
         if not cleaning:
             return None
 
-        deleted_id = await self.db.execute(query=DELETE_CLEANING_BY_ID_QUERY, values={"id": id})
+        deleted_id = await self.db.execute(
+            query=DELETE_CLEANING_BY_ID_QUERY, values={"id": id}
+        )
 
         return deleted_id

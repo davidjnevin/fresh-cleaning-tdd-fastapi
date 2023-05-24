@@ -189,7 +189,7 @@ class TestUpdateCleaning:
 
 
 class TestDeleteCleaning:
-    async def test_can_delete_cleaning_successfully(
+    async def test_can_delete_cleaning_successfull(
         self, app: FastAPI, client: AsyncClient, test_cleaning: CleaningInDB
     ) -> None:
         # delete the cleaning
@@ -212,7 +212,7 @@ class TestDeleteCleaning:
             (None, 422),
         ),
     )
-    async def test_can_delete_cleaning_successfully(
+    async def test_delete_cleaning_with_invalid_input_throws_error(
         self,
         app: FastAPI,
         client: AsyncClient,

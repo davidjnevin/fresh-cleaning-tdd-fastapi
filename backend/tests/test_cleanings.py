@@ -1,20 +1,15 @@
 from typing import List, Union
 
 import pytest
-
-from httpx import AsyncClient
+from app.models.cleaning import CleaningCreate, CleaningInDB
 from fastapi import FastAPI
-
-
+from httpx import AsyncClient
 from starlette.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_404_NOT_FOUND,
     HTTP_422_UNPROCESSABLE_ENTITY,
 )
-
-
-from app.models.cleaning import CleaningCreate, CleaningInDB
 
 # decorate all tests with @pytest.mark.asyncio
 pytestmark = pytest.mark.asyncio

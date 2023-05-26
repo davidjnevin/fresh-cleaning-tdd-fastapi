@@ -1,6 +1,23 @@
+from typing import List, Optional, Type, Union
+
+import jwt
 import pytest
-from httpx import AsyncClient
+from app.core.config import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    JWT_ALGORITHM,
+    JWT_AUDIENCE,
+    JWT_TOKEN_PREFIX,
+    SECRET_KEY,
+)
+from app.db.repositories.users import UsersRepository
+from app.models.token import JWTCreds, JWTMeta, JWTPayload
+from app.models.user import UserCreate, UserInDB, UserPublic
+from app.services import auth_service
+from databases import Database
 from fastapi import FastAPI
+from httpx import AsyncClient
+from pydantic import ValidationError
+from starlette.datastructures import Secret
 from starlette.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
@@ -9,26 +26,6 @@ from starlette.status import (
     HTTP_404_NOT_FOUND,
     HTTP_422_UNPROCESSABLE_ENTITY,
 )
-from app.models.user import UserCreate, UserInDB
-from databases import Database
-from app.db.repositories.users import UsersRepository
-from app.services import auth_service
-
-from typing import List, Union, Type, Optional
-import pytest
-import jwt
-from pydantic import ValidationError
-from starlette.datastructures import Secret
-
-from app.core.config import (
-    SECRET_KEY,
-    JWT_ALGORITHM,
-    JWT_AUDIENCE,
-    JWT_TOKEN_PREFIX,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
-)
-from app.models.token import JWTMeta, JWTCreds, JWTPayload
-
 
 pytestmark = pytest.mark.asyncio
 
@@ -77,9 +74,7 @@ class TestUserRegistration:
         assert user_in_db.username == new_user["username"]
 
         # check that the user returned is equal to the user in the databse
-        created_user = UserInDB(**res.json(), password="whatever", salt="123").dict(
-            exclude={"password", "salt"}
-        )
+        created_user = UserPublic(**res.json()).dict(exclude={"access_token"})
         assert created_user == user_in_db.dict(exclude={"password", "salt"})
 
     async def test_users_saved_password_is_hashed_and_has_salt(

@@ -1,7 +1,9 @@
 import string
 from typing import Optional
+
+from app.models.core import CoreModel, DateTimeModelMixin, IDModelMixin
+from app.models.token import AccessToken
 from pydantic import EmailStr, constr, validator
-from app.models.core import DateTimeModelMixin, IDModelMixin, CoreModel
 
 
 # simple check for valid username
@@ -70,4 +72,4 @@ class UserInDB(IDModelMixin, DateTimeModelMixin, UserBase):
 
 
 class UserPublic(IDModelMixin, DateTimeModelMixin, UserBase):
-    pass
+    access_token: Optional[AccessToken]

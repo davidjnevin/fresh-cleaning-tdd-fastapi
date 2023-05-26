@@ -1,10 +1,10 @@
-from pydantic import EmailStr
-from fastapi import HTTPException
-from starlette.status import HTTP_400_BAD_REQUEST
 from app.db.repositories.base import BaseRepository
-from app.models.user import UserCreate, UserUpdate, UserInDB, UserPublic
-from databases import Database
+from app.models.user import UserCreate, UserInDB, UserPublic, UserUpdate
 from app.services import auth_service
+from databases import Database
+from fastapi import HTTPException
+from pydantic import EmailStr
+from starlette.status import HTTP_400_BAD_REQUEST
 
 GET_USER_BY_EMAIL_QUERY = """
     SELECT id, username, email, email_verified, password, salt, is_active, is_superuser, created_at, updated_at

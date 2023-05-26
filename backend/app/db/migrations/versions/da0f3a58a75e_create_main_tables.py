@@ -4,8 +4,9 @@ Revises:
 Create Date: 2023-05-24 09:11:58.007599
 """
 from typing import Tuple
-from alembic import op
+
 import sqlalchemy as sa
+from alembic import op
 
 # revision identifiers, used by Alembic
 revision = "da0f3a58a75e"

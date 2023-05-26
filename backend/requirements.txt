@@ -14,5 +14,5 @@ passlib[bcrypt]==1.7.2
 # dev
 pytest==6.2.2
 pytest-asyncio==0.14.0
-httpx==0.16.1
+httpx==0.23.0
 asgi-lifespan==1.0.1

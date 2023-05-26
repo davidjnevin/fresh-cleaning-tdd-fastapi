@@ -1,10 +1,9 @@
 from typing import List
 
+from app.db.repositories.base import BaseRepository
+from app.models.cleaning import CleaningCreate, CleaningInDB, CleaningUpdate
 from fastapi import HTTPException
 from starlette.status import HTTP_400_BAD_REQUEST
-
-from app.db.repositories.base import BaseRepository
-from app.models.cleaning import CleaningCreate, CleaningUpdate, CleaningInDB
 
 CREATE_CLEANING_QUERY = """
     INSERT INTO cleanings (name, description, price, cleaning_type)

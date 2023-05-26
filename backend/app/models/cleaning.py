@@ -1,6 +1,7 @@
-from typing import Optional
 from enum import Enum
-from app.models.core import IDModelMixin, CoreModel
+from typing import Optional
+
+from app.models.core import CoreModel, IDModelMixin
 
 
 class CleaningType(str, Enum):

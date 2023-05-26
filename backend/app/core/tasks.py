@@ -1,6 +1,7 @@
 from typing import Callable
+
+from app.db.tasks import close_db_connection, connect_to_db
 from fastapi import FastAPI
-from app.db.tasks import connect_to_db, close_db_connection
 
 
 def create_start_app_handler(app: FastAPI) -> Callable:

@@ -1,8 +1,9 @@
-import os
-from fastapi import FastAPI
-from databases import Database
-from app.core.config import DATABASE_URL
 import logging
+import os
+
+from app.core.config import DATABASE_URL
+from databases import Database
+from fastapi import FastAPI
 
 logger = logging.getLogger(__name__)
 

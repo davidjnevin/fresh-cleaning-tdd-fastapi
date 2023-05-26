@@ -1,18 +1,17 @@
-import warnings
 import os
-
-import pytest
-from asgi_lifespan import LifespanManager
-
-from fastapi import FastAPI
-from httpx import AsyncClient
-from databases import Database
-
-from app.models.cleaning import CleaningCreate, CleaningInDB
-from app.db.repositories.cleanings import CleaningsRepository
+import warnings
 
 import alembic
+import pytest
 from alembic.config import Config
+from app.db.repositories.cleanings import CleaningsRepository
+from app.db.repositories.users import UsersRepository
+from app.models.cleaning import CleaningCreate, CleaningInDB
+from app.models.user import UserCreate, UserInDB
+from asgi_lifespan import LifespanManager
+from databases import Database
+from fastapi import FastAPI
+from httpx import AsyncClient
 
 
 # Apply migrations at beginning and end of testing session
@@ -64,3 +63,18 @@ async def client(app: FastAPI) -> AsyncClient:
             headers={"Content-Type": "application/json"},
         ) as client:
             yield client
+
+
+@pytest.fixture
+async def test_user(db: Database) -> UserInDB:
+    new_user = UserCreate(
+        email="lebron@james.io",
+        username="lebronjames",
+        password="heatcavslakers",
+    )
+    user_repo = UsersRepository(db)
+    existing_user = await user_repo.get_user_by_email(email=new_user.email)
+    # our database persists for the duration of the testing session
+    if existing_user:
+        return existing_user
+    return await user_repo.register_new_user(new_user=new_user)

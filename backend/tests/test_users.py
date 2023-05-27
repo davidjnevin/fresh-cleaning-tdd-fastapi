@@ -68,13 +68,17 @@ class TestUserRegistration:
         assert res.status_code == HTTP_201_CREATED
 
         # ensure that the user now exists in the db
-        user_in_db = await user_repo.get_user_by_email(email=new_user["email"], populate=False)
+        user_in_db = await user_repo.get_user_by_email(
+            email=new_user["email"], populate=False
+        )
         assert user_in_db is not None
         assert user_in_db.email == new_user["email"]
         assert user_in_db.username == new_user["username"]
 
         # check that the user returned is equal to the user in the databse
-        created_user = UserPublic(**res.json()).dict(exclude={"access_token", "profile"})
+        created_user = UserPublic(**res.json()).dict(
+            exclude={"access_token", "profile"}
+        )
         assert created_user == user_in_db.dict(exclude={"password", "salt"})
 
     async def test_users_saved_password_is_hashed_and_has_salt(
@@ -96,7 +100,9 @@ class TestUserRegistration:
         assert res.status_code == HTTP_201_CREATED
         # ensure that the users password is hashed in the db
         # and that we can verify it using our auth service
-        user_in_db = await user_repo.get_user_by_email(email=new_user["email"], populate=False)
+        user_in_db = await user_repo.get_user_by_email(
+            email=new_user["email"], populate=False
+        )
         assert user_in_db is not None
         assert user_in_db.salt is not None and user_in_db.salt != "123"
         assert user_in_db.password != new_user["password"]

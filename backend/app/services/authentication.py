@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from typing import Optional, Type
-from app.models.user import UserBase, UserPasswordUpdate
 
 import bcrypt
 import jwt
@@ -12,7 +11,7 @@ from app.core.config import (
     SECRET_KEY,
 )
 from app.models.token import JWTCreds, JWTMeta, JWTPayload
-from app.models.user import UserInDB, UserPasswordUpdate
+from app.models.user import UserBase, UserInDB, UserPasswordUpdate
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 from pydantic import ValidationError
@@ -21,10 +20,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class AuthException(BaseException):
-    """
-    Custom auth exception that can be modified later on.
-    """
-
     pass
 
 
@@ -34,6 +29,7 @@ class AuthService:
     ) -> UserPasswordUpdate:
         salt = self.generate_salt()
         hashed_password = self.hash_password(password=plaintext_password, salt=salt)
+
         return UserPasswordUpdate(salt=salt, password=hashed_password)
 
     def generate_salt(self) -> str:
@@ -66,11 +62,10 @@ class AuthService:
             **jwt_meta.dict(),
             **jwt_creds.dict(),
         )
-        # NOTE - previous versions of pyjwt ("<2.0") returned the token as bytes insted of a string.
-        # That is no longer the case and the `.decode("utf-8")` has been removed.
         access_token = jwt.encode(
             token_payload.dict(), secret_key, algorithm=JWT_ALGORITHM
         )
+
         return access_token
 
     def get_username_from_token(self, *, token: str, secret_key: str) -> Optional[str]:

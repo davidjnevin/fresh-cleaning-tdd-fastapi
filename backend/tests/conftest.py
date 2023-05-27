@@ -42,8 +42,18 @@ def db(app: FastAPI) -> Database:
     return app.state._db
 
 
+# @pytest.fixture
+# async def test_cleaning(db: Database) -> CleaningInDB:
+#     cleaning_repo = CleaningsRepository(db)
+#     new_cleaning = CleaningCreate(
+#         name="fake cleaning name", description="fake cleaning description", price=9.99, cleaning_type="spot_clean",
+#     )
+
+#     return await cleaning_repo.create_cleaning(new_cleaning=new_cleaning)
+
+
 @pytest.fixture
-async def test_cleaning(db: Database) -> CleaningInDB:
+async def test_cleaning(db: Database, test_user: UserInDB) -> CleaningInDB:
     cleaning_repo = CleaningsRepository(db)
     new_cleaning = CleaningCreate(
         name="fake cleaning name",
@@ -52,7 +62,41 @@ async def test_cleaning(db: Database) -> CleaningInDB:
         cleaning_type="spot_clean",
     )
 
-    return await cleaning_repo.create_cleaning(new_cleaning=new_cleaning)
+    return await cleaning_repo.create_cleaning(
+        new_cleaning=new_cleaning, requesting_user=test_user
+    )
+
+
+@pytest.fixture
+async def test_user(db: Database) -> UserInDB:
+    new_user = UserCreate(
+        email="lebron@james.io", username="lebronjames", password="heatcavslakers"
+    )
+
+    user_repo = UsersRepository(db)
+
+    existing_user = await user_repo.get_user_by_email(email=new_user.email)
+    if existing_user:
+        return existing_user
+
+    return await user_repo.register_new_user(new_user=new_user)
+
+
+@pytest.fixture
+async def test_user2(db: Database) -> UserInDB:
+    new_user = UserCreate(
+        email="serena@williams.io",
+        username="serenawilliams",
+        password="tennistwins",
+    )
+
+    user_repo = UsersRepository(db)
+
+    existing_user = await user_repo.get_user_by_email(email=new_user.email)
+    if existing_user:
+        return existing_user
+
+    return await user_repo.register_new_user(new_user=new_user)
 
 
 # Make requests in our tests
@@ -68,40 +112,14 @@ async def client(app: FastAPI) -> AsyncClient:
 
 
 @pytest.fixture
-async def test_user(db: Database) -> UserInDB:
-    new_user = UserCreate(
-        email="lebron@james.io",
-        username="lebronjames",
-        password="heatcavslakers",
-    )
-    user_repo = UsersRepository(db)
-    existing_user = await user_repo.get_user_by_email(email=new_user.email)
-    # our database persists for the duration of the testing session
-    if existing_user:
-        return existing_user
-    return await user_repo.register_new_user(new_user=new_user)
-
-
-@pytest.fixture
 def authorized_client(client: AsyncClient, test_user: UserInDB) -> AsyncClient:
     access_token = auth_service.create_access_token_for_user(
         user=test_user, secret_key=str(SECRET_KEY)
     )
+
     client.headers = {
         **client.headers,
         "Authorization": f"{JWT_TOKEN_PREFIX} {access_token}",
     }
-    return client
 
-@pytest.fixture
-async def test_user2(db: Database) -> UserInDB:
-    new_user = UserCreate(
-        email="serena@williams.io",
-        username="serenawilliams",
-        password="tennistwins",
-    )
-    user_repo = UsersRepository(db)
-    existing_user = await user_repo.get_user_by_email(email=new_user.email)
-    if existing_user:
-        return existing_user
-    return await user_repo.register_new_user(new_user=new_user)
+    return client

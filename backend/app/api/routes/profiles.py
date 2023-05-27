@@ -8,7 +8,11 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Path, status
 router = APIRouter()
 
 
-@router.get("/{username}/", response_model=ProfilePublic, name="profiles:get-profile-by-username")
+@router.get(
+    "/{username}/",
+    response_model=ProfilePublic,
+    name="profiles:get-profile-by-username",
+)
 async def get_profile_by_username(
     username: str = Path(..., min_length=3, regex="^[a-zA-Z0-9_-]+$"),
     current_user: UserInDB = Depends(get_current_active_user),
@@ -16,7 +20,10 @@ async def get_profile_by_username(
 ) -> ProfilePublic:
     profile = await profiles_repo.get_profile_by_username(username=username)
     if not profile:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No profile found with that username.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No profile found with that username.",
+        )
     return profile
 
 
@@ -26,5 +33,7 @@ async def update_own_profile(
     current_user: UserInDB = Depends(get_current_active_user),
     profiles_repo: ProfilesRepository = Depends(get_repository(ProfilesRepository)),
 ) -> ProfilePublic:
-    updated_profile = await profiles_repo.update_profile(profile_update=profile_update, requesting_user=current_user)
+    updated_profile = await profiles_repo.update_profile(
+        profile_update=profile_update, requesting_user=current_user
+    )
     return updated_profile

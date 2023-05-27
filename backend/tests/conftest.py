@@ -4,10 +4,12 @@ import warnings
 import alembic
 import pytest
 from alembic.config import Config
+from app.core.config import JWT_TOKEN_PREFIX, SECRET_KEY
 from app.db.repositories.cleanings import CleaningsRepository
 from app.db.repositories.users import UsersRepository
 from app.models.cleaning import CleaningCreate, CleaningInDB
 from app.models.user import UserCreate, UserInDB
+from app.services import auth_service
 from asgi_lifespan import LifespanManager
 from databases import Database
 from fastapi import FastAPI
@@ -78,3 +80,15 @@ async def test_user(db: Database) -> UserInDB:
     if existing_user:
         return existing_user
     return await user_repo.register_new_user(new_user=new_user)
+
+
+@pytest.fixture
+def authorized_client(client: AsyncClient, test_user: UserInDB) -> AsyncClient:
+    access_token = auth_service.create_access_token_for_user(
+        user=test_user, secret_key=str(SECRET_KEY)
+    )
+    client.headers = {
+        **client.headers,
+        "Authorization": f"{JWT_TOKEN_PREFIX} {access_token}",
+    }
+    return client

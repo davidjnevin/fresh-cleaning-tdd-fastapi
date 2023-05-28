@@ -3,13 +3,8 @@ from typing import Optional, Type
 
 import bcrypt
 import jwt
-from app.core.config import (
-    ACCESS_TOKEN_EXPIRE_MINUTES,
-    JWT_ALGORITHM,
-    JWT_AUDIENCE,
-    JWT_TOKEN_PREFIX,
-    SECRET_KEY,
-)
+from app.core.config import (ACCESS_TOKEN_EXPIRE_MINUTES, JWT_ALGORITHM,
+                             JWT_AUDIENCE, JWT_TOKEN_PREFIX, SECRET_KEY)
 from app.models.token import JWTCreds, JWTMeta, JWTPayload
 from app.models.user import UserBase, UserInDB, UserPasswordUpdate
 from fastapi import HTTPException, status
@@ -24,9 +19,7 @@ class AuthException(BaseException):
 
 
 class AuthService:
-    def create_salt_and_hashed_password(
-        self, *, plaintext_password: str
-    ) -> UserPasswordUpdate:
+    def create_salt_and_hashed_password(self, *, plaintext_password: str) -> UserPasswordUpdate:
         salt = self.generate_salt()
         hashed_password = self.hash_password(password=plaintext_password, salt=salt)
 
@@ -62,20 +55,13 @@ class AuthService:
             **jwt_meta.dict(),
             **jwt_creds.dict(),
         )
-        access_token = jwt.encode(
-            token_payload.dict(), secret_key, algorithm=JWT_ALGORITHM
-        )
+        access_token = jwt.encode(token_payload.dict(), secret_key, algorithm=JWT_ALGORITHM)
 
         return access_token
 
     def get_username_from_token(self, *, token: str, secret_key: str) -> Optional[str]:
         try:
-            decoded_token = jwt.decode(
-                token,
-                str(secret_key),
-                audience=JWT_AUDIENCE,
-                algorithms=[JWT_ALGORITHM],
-            )
+            decoded_token = jwt.decode(token, str(secret_key), audience=JWT_AUDIENCE, algorithms=[JWT_ALGORITHM])
             payload = JWTPayload(**decoded_token)
         except (jwt.PyJWTError, ValidationError):
             raise HTTPException(

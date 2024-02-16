@@ -2,6 +2,7 @@ import string
 from typing import Optional
 
 from app.models.core import CoreModel, DateTimeModelMixin, IDModelMixin
+from app.models.profile import ProfilePublic
 from app.models.token import AccessToken
 from pydantic import EmailStr, constr, validator
 
@@ -73,3 +74,4 @@ class UserInDB(IDModelMixin, DateTimeModelMixin, UserBase):
 
 class UserPublic(IDModelMixin, DateTimeModelMixin, UserBase):
     access_token: Optional[AccessToken]
+    profile: Optional[ProfilePublic]
